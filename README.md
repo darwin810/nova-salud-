@@ -31,7 +31,9 @@ Aplicación web full stack para controlar el inventario, registrar ventas y agil
    mongosh --eval "rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]})"
    ```
 
-3. En el directorio del proyecto ejecuta `npm run dev` y abre [http://localhost:3000](http://localhost:3000). Para una instalación local no necesitas crear `.env`: la app usa la URI local de MongoDB, genera una clave JWT de desarrollo al iniciar y crea el usuario administrador la primera vez.
+3. En el directorio del proyecto ejecuta `npm run dev` y abre [http://localhost:3000](http://localhost:3000). Para una instalación local no necesitas crear `.env`: la app usa la URI local de MongoDB, genera una clave JWT de desarrollo al iniciar, crea la base `nova_salud`, prepara las colecciones `users`, `products` y `sales` con sus índices y crea el usuario administrador la primera vez. El catálogo empieza vacío; los productos de la botica se ingresan desde Inventario. No ejecutes scripts manuales en `mongosh` para crear la base o las colecciones.
+
+   Para comprobarlo desde `mongosh` después de iniciar la app, conecta a `mongodb://localhost:27017/nova_salud?replicaSet=rs0` y ejecuta `show collections` y `db.users.find({}, { username: 1, mustChangePassword: 1 })`.
 
 Si MongoDB escucha en otra dirección, copia `.env.example` a `.env` y configura `MONGODB_URI`. `.env` está excluido de Git. Para producción también debes establecer una clave JWT aleatoria, un origen HTTPS y las credenciales iniciales seguras.
 

@@ -2,6 +2,7 @@ require('dotenv').config();
 const crypto = require('node:crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const { connectAndPrepare } = require('./database');
 const { makeApp } = require('./app');
 const { User } = require('./models');
 
@@ -20,7 +21,7 @@ async function main() {
     throw new Error('En producción configura APP_ORIGIN HTTPS y ADMIN_PASSWORD de 12 o más caracteres.');
   }
   try {
-    await mongoose.connect(config.mongoUri, { serverSelectionTimeoutMS: 10000 });
+    await connectAndPrepare(config.mongoUri);
   } catch {
     throw new Error(config.nodeEnv === 'production'
       ? 'No se pudo conectar a MongoDB. Revisa MONGODB_URI y el acceso de red.'
