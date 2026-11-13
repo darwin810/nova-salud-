@@ -13,35 +13,33 @@ Aplicación web full stack para controlar el inventario, registrar ventas y agil
 ## Requisitos
 
 - Node.js 20+ y npm.
-- Docker Desktop y Docker Compose para levantar MongoDB local; o una instancia MongoDB en replica set.
+- MongoDB local iniciado como replica set `rs0` en `127.0.0.1:27017` (o una URI de MongoDB replica set en `.env`).
 
 ## Instalación local
 
-1. Instala dependencias: `npm install`.
-2. Copia `.env.example` a `.env` y genera una clave JWT aleatoria de al menos 32 caracteres:
+1. Clona el repositorio e instala dependencias: `npm install`.
+2. Inicia MongoDB en modo replica set con el nombre `rs0`. Si el servidor ya está instalado, configura `replication.replSetName: rs0` en su archivo de configuración y reinícialo. Para una ejecución manual de desarrollo en Windows, crea el directorio de datos y ejecuta:
 
    ```powershell
-   Copy-Item .env.example .env
-   node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+   New-Item -ItemType Directory -Force C:\data\db
+   mongod --dbpath C:\data\db --replSet rs0
    ```
 
-   Pega el valor generado como `JWT_SECRET`. `.env` está excluido de Git y no se envía al navegador.
-
-3. Inicia MongoDB y su replica set:
+   En otra terminal inicializa el replica set una sola vez:
 
    ```powershell
-   docker compose up -d
+   mongosh --eval "rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]})"
    ```
 
-   Docker Compose levanta MongoDB e inicializa el replica set `rs0`. Espera unos segundos a que el servicio quede listo. La URI local de ejemplo apunta a `127.0.0.1:27017`.
+3. En el directorio del proyecto ejecuta `npm run dev` y abre [http://localhost:3000](http://localhost:3000). Para una instalación local no necesitas crear `.env`: la app usa la URI local de MongoDB, genera una clave JWT de desarrollo al iniciar y crea el usuario administrador la primera vez.
 
-4. Ejecuta `npm run dev` y abre [http://localhost:3000](http://localhost:3000).
+Si MongoDB escucha en otra dirección, copia `.env.example` a `.env` y configura `MONGODB_URI`. `.env` está excluido de Git. Para producción también debes establecer una clave JWT aleatoria, un origen HTTPS y las credenciales iniciales seguras.
 
 En `development`, si la base aún no tiene administrador, Nova crea el acceso inicial solicitado: **usuario `admin`, contraseña `123456`**. El sistema fuerza el cambio inmediato a una contraseña de al menos 12 caracteres. Esta credencial solo se proporciona para desarrollo local; nunca uses esa contraseña en un entorno público.
 
 ## Variables privadas
 
-Revisa `.env.example`. En producción configura `NODE_ENV=production`, `MONGODB_URI` con usuario de mínimo privilegio y TLS, `JWT_SECRET` generado aleatoriamente, `APP_ORIGIN` con el origen HTTPS público exacto y `ADMIN_USERNAME`/`ADMIN_PASSWORD` seguros para el administrador inicial. El servidor exige una contraseña inicial de al menos 12 caracteres en producción y fuerza el cambio tras el primer ingreso. No pongas secretos en `public/`, HTML ni scripts del navegador. Monta el servidor detrás de un proxy HTTPS correctamente configurado.
+Revisa `.env.example`. En producción configura `NODE_ENV=production`, `MONGODB_URI` con usuario de mínimo privilegio y TLS, `JWT_SECRET` generado aleatoriamente, `APP_ORIGIN` con el origen HTTPS público exacto y `ADMIN_USERNAME`/`ADMIN_PASSWORD` seguros para el administrador inicial. El servidor exige una contraseña inicial de al menos 12 caracteres en producción y fuerza el cambio tras el primer ingreso. En desarrollo, si falta `MONGODB_URI`, se conecta a `mongodb://127.0.0.1:27017/nova_salud?replicaSet=rs0`; si falta `JWT_SECRET`, crea una clave temporal en memoria. No pongas secretos en `public/`, HTML ni scripts del navegador. Monta el servidor detrás de un proxy HTTPS correctamente configurado.
 
 ## Base de datos y reglas de operación
 

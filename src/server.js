@@ -1,4 +1,5 @@
 require('dotenv').config();
+const crypto = require('node:crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const { makeApp } = require('./app');
@@ -7,8 +8,8 @@ const { User } = require('./models');
 const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: Number(process.env.PORT || 3000),
-  mongoUri: process.env.MONGODB_URI,
-  jwtSecret: process.env.JWT_SECRET,
+  mongoUri: process.env.MONGODB_URI || (process.env.NODE_ENV === 'production' ? '' : 'mongodb://127.0.0.1:27017/nova_salud?replicaSet=rs0'),
+  jwtSecret: process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? '' : crypto.randomBytes(48).toString('hex')),
   appOrigin: process.env.APP_ORIGIN || 'http://localhost:3000',
 };
 
@@ -18,7 +19,13 @@ async function main() {
   if (config.nodeEnv === 'production' && (!config.appOrigin.startsWith('https://') || !process.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD.length < 12)) {
     throw new Error('En producción configura APP_ORIGIN HTTPS y ADMIN_PASSWORD de 12 o más caracteres.');
   }
-  await mongoose.connect(config.mongoUri, { serverSelectionTimeoutMS: 10000 });
+  try {
+    await mongoose.connect(config.mongoUri, { serverSelectionTimeoutMS: 10000 });
+  } catch {
+    throw new Error(config.nodeEnv === 'production'
+      ? 'No se pudo conectar a MongoDB. Revisa MONGODB_URI y el acceso de red.'
+      : 'No se pudo conectar a MongoDB local. Inicia MongoDB en 127.0.0.1:27017 como replica set rs0 y vuelve a ejecutar npm run dev.');
+  }
   await seedInitialAdmin();
   const app = makeApp(config);
   const server = app.listen(config.port, () => console.log(`Nova Salud disponible en ${config.appOrigin}`));
