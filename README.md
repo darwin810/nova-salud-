@@ -27,14 +27,13 @@ Aplicación web full stack para controlar el inventario, registrar ventas y agil
 
    Pega el valor generado como `JWT_SECRET`. `.env` está excluido de Git y no se envía al navegador.
 
-3. En una terminal, inicia MongoDB y su replica set:
+3. Inicia MongoDB y su replica set:
 
    ```powershell
-   docker compose up -d mongo
-   docker compose exec mongo mongosh --quiet --eval "try { rs.status().ok } catch (e) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }"
+   docker compose up -d
    ```
 
-   Espera unos segundos a que el replica set quede inicializado. La URI local de ejemplo apunta a `127.0.0.1:27017` y al replica set `rs0`.
+   Docker Compose levanta MongoDB e inicializa el replica set `rs0`. Espera unos segundos a que el servicio quede listo. La URI local de ejemplo apunta a `127.0.0.1:27017`.
 
 4. Ejecuta `npm run dev` y abre [http://localhost:3000](http://localhost:3000).
 
