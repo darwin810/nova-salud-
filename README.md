@@ -31,9 +31,9 @@ Aplicación web full stack para controlar el inventario, registrar ventas y agil
    mongosh --eval "rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]})"
    ```
 
-3. En el directorio del proyecto ejecuta `npm run dev` y abre [http://localhost:3000](http://localhost:3000). Para una instalación local no necesitas crear `.env`: la app usa la URI local de MongoDB, genera una clave JWT de desarrollo al iniciar, crea la base `nova_salud`, prepara las colecciones `users`, `products` y `sales` con sus índices y crea el usuario administrador la primera vez. El catálogo empieza vacío; los productos de la botica se ingresan desde Inventario. No ejecutes scripts manuales en `mongosh` para crear la base o las colecciones.
+3. En el directorio del proyecto ejecuta `npm run dev` y abre [http://localhost:3000](http://localhost:3000). Para una instalación local no necesitas crear `.env`: la app usa la URI local de MongoDB, genera una clave JWT de desarrollo al iniciar, crea la base `nova_salud`, prepara las colecciones `usuarios`, `productos` y `ventas` con sus índices y crea el usuario administrador la primera vez. La clave se guarda como hash bcrypt; el texto original nunca se guarda en MongoDB. El catálogo empieza vacío; los productos de la botica se ingresan desde Inventario. No ejecutes scripts manuales para crear la base o las colecciones.
 
-   Para comprobarlo desde `mongosh` después de iniciar la app, conecta a `mongodb://localhost:27017/nova_salud?replicaSet=rs0` y ejecuta `show collections` y `db.users.find({}, { username: 1, mustChangePassword: 1 })`.
+Para comprobarlo desde `mongosh` después de iniciar la app, conecta a `mongodb://localhost:27017/nova_salud?replicaSet=rs0`, ejecuta `show collections` y luego `db.usuarios.find()`. Verás el documento del administrador y el campo `passwordHash` con un hash bcrypt, no la contraseña `123456`.
 
 Si MongoDB escucha en otra dirección, copia `.env.example` a `.env` y configura `MONGODB_URI`. `.env` está excluido de Git. Para producción también debes establecer una clave JWT aleatoria, un origen HTTPS y las credenciales iniciales seguras.
 
@@ -61,7 +61,7 @@ Luego ejecuta `npm run dev`. Debe aparecer `MongoDB listo: nova_salud` y `Nova S
 2. En **Nueva venta**, agrega una unidad, escribe opcionalmente un cliente y confirma. Verifica que el total sea `S/ 10.50` y que el inventario ahora muestre `4`.
 3. En **Historial de ventas**, comprueba que aparezca la venta con su detalle y total.
 4. Edita el producto y deja el stock en `2`; debe aparecer en el panel de reposición. Si lo dejas en `0`, debe marcarse como agotado.
-5. Para revisar MongoDB, ejecuta `mongosh "mongodb://localhost:27017/nova_salud?replicaSet=rs0"`, luego `show collections` y `db.users.find({}, { username: 1, mustChangePassword: 1 })`.
+5. Para revisar MongoDB, ejecuta `mongosh "mongodb://localhost:27017/nova_salud?replicaSet=rs0"`, luego `show collections` y `db.usuarios.find()`.
 
 Si el paso de `mongosh` indica que no hay servidor, inicia el servicio MongoDB. Si indica que el servidor no es miembro de un replica set, configura `replication.replSetName: rs0` en el archivo `mongod.cfg` y reinicia el servicio de MongoDB antes de volver a ejecutar la inicialización. La transacción de venta requiere ese modo de MongoDB.
 
@@ -73,7 +73,7 @@ Revisa `.env.example`. En producción configura `NODE_ENV=production`, `MONGODB_
 
 ## Base de datos y reglas de operación
 
-Mongoose crea las colecciones e índices necesarios (`users`, `products`, `sales`) al iniciar. No hace falta una migración manual inicial. Las ventas guardan una instantánea del precio de catálogo, el importe se calcula solo en el servidor y cada operación descuenta existencias y registra la venta en una transacción MongoDB. La clave `Idempotency-Key` evita duplicar una venta al repetir la misma solicitud. La edición de productos usa una versión del documento; si otra operación lo modificó, el servidor responde `409` en vez de pisar el cambio.
+Mongoose crea las colecciones e índices necesarios (`usuarios`, `productos`, `ventas`) al iniciar. No hace falta una migración manual inicial. Las ventas guardan una instantánea del precio de catálogo, el importe se calcula solo en el servidor y cada operación descuenta existencias y registra la venta en una transacción MongoDB. La clave `Idempotency-Key` evita duplicar una venta al repetir la misma solicitud. La edición de productos usa una versión del documento; si otra operación lo modificó, el servidor responde `409` en vez de pisar el cambio.
 
 ## Pruebas
 

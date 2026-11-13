@@ -9,7 +9,7 @@ async function connectAndPrepare(uri) {
     if (!exists) await model.createCollection();
     await model.createIndexes();
   }
-  console.log(`MongoDB listo: ${mongoose.connection.name} (colecciones users, products, sales).`);
+  console.log(`MongoDB listo: ${mongoose.connection.name} (colecciones usuarios, productos, ventas).`);
 }
 
 module.exports = { connectAndPrepare };
