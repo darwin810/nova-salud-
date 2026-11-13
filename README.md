@@ -37,6 +37,34 @@ Aplicación web full stack para controlar el inventario, registrar ventas y agil
 
 Si MongoDB escucha en otra dirección, copia `.env.example` a `.env` y configura `MONGODB_URI`. `.env` está excluido de Git. Para producción también debes establecer una clave JWT aleatoria, un origen HTTPS y las credenciales iniciales seguras.
 
+### Guía rápida para Windows y VS Code
+
+Abre la carpeta clonada en VS Code y usa **Terminal → Nueva terminal**. Ejecuta los comandos desde la raíz del proyecto:
+
+```powershell
+git clone https://github.com/darwin810/nova-salud-.git
+cd nova-salud-
+npm install
+```
+
+Comprueba que MongoDB responde con `mongosh`. El servidor debe haberse iniciado con el replica set `rs0`; para el servicio instalado en Windows, agrega `replication:` y debajo `replSetName: rs0` al archivo `mongod.cfg` y reinicia MongoDB. Con `mongod` ya activo en ese modo, inicializa el replica set una sola vez:
+
+```powershell
+mongosh --eval "try { rs.status().ok } catch (e) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }"
+```
+
+Luego ejecuta `npm run dev`. Debe aparecer `MongoDB listo: nova_salud` y `Nova Salud disponible en http://localhost:3000`. Abre esa dirección. Ingresa con **admin / 123456** y elige una contraseña nueva de al menos 12 caracteres. Estos datos iniciales son solo para desarrollo local.
+
+### Comprobación de las funciones
+
+1. En **Inventario → Nuevo producto**, agrega un producto de prueba con precio `10.50`, existencias `5` y mínimo `2`.
+2. En **Nueva venta**, agrega una unidad, escribe opcionalmente un cliente y confirma. Verifica que el total sea `S/ 10.50` y que el inventario ahora muestre `4`.
+3. En **Historial de ventas**, comprueba que aparezca la venta con su detalle y total.
+4. Edita el producto y deja el stock en `2`; debe aparecer en el panel de reposición. Si lo dejas en `0`, debe marcarse como agotado.
+5. Para revisar MongoDB, ejecuta `mongosh "mongodb://localhost:27017/nova_salud?replicaSet=rs0"`, luego `show collections` y `db.users.find({}, { username: 1, mustChangePassword: 1 })`.
+
+Si el paso de `mongosh` indica que no hay servidor, inicia el servicio MongoDB. Si indica que el servidor no es miembro de un replica set, configura `replication.replSetName: rs0` en el archivo `mongod.cfg` y reinicia el servicio de MongoDB antes de volver a ejecutar la inicialización. La transacción de venta requiere ese modo de MongoDB.
+
 En `development`, si la base aún no tiene administrador, Nova crea el acceso inicial solicitado: **usuario `admin`, contraseña `123456`**. El sistema fuerza el cambio inmediato a una contraseña de al menos 12 caracteres. Esta credencial solo se proporciona para desarrollo local; nunca uses esa contraseña en un entorno público.
 
 ## Variables privadas
