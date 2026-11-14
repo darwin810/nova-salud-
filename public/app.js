@@ -26,11 +26,42 @@ async function boot() {
   try { const { user } = await api('/auth/me'); state.user = user; showApp(); await refreshAll(); if (user.mustChangePassword) changePassword(); }
   catch { showLogin(); }
 }
+function validateLoginField(field) {
+  const messageNode = field.name === 'username' ? $('#usernameError') : $('#passwordError');
+  const value = field.value.trim();
+  const message = field.name === 'username'
+    ? (!value ? 'Escribe tu usuario.' : value.length < 3 ? 'Debe tener al menos 3 caracteres.' : value.length > 40 || !/^[a-zA-Z0-9._-]+$/.test(value) ? 'Usa letras, números, punto, guion o guion bajo.' : '')
+    : (!field.value ? 'Escribe tu contraseña.' : new TextEncoder().encode(field.value).length > 72 ? 'La contraseña supera el límite permitido.' : '');
+  field.setAttribute('aria-invalid', String(Boolean(message)));
+  messageNode.textContent = message;
+  return !message;
+}
+const loginFields = [...$('#loginForm').querySelectorAll('input')];
+loginFields.forEach((field) => {
+  field.addEventListener('blur', () => { field.dataset.touched = 'true'; validateLoginField(field); });
+  field.addEventListener('input', () => {
+    if (field.dataset.touched) validateLoginField(field);
+    $('#loginError').textContent = '';
+  });
+});
+$('#toggleLoginPassword').addEventListener('click', (event) => {
+  const field = $('#loginPassword');
+  const visible = field.type === 'password';
+  field.type = visible ? 'text' : 'password';
+  event.currentTarget.textContent = visible ? 'Ocultar' : 'Mostrar';
+  event.currentTarget.setAttribute('aria-label', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+  event.currentTarget.setAttribute('aria-pressed', String(visible));
+  field.focus();
+});
 $('#loginForm').addEventListener('submit', async (event) => {
   event.preventDefault(); $('#loginError').textContent = '';
+  const valid = loginFields.map((field) => { field.dataset.touched = 'true'; return validateLoginField(field); }).every(Boolean);
+  if (!valid) { loginFields.find((field) => field.getAttribute('aria-invalid') === 'true')?.focus(); return; }
   const form = new FormData(event.currentTarget);
-  try { const result = await api('/auth/login', { method: 'POST', body: JSON.stringify({ username: form.get('username'), password: form.get('password') }) }); state.user = result.user; showApp(); await refreshAll(); if (result.user.mustChangePassword) changePassword(); }
-  catch (error) { $('#loginError').textContent = error.message; }
+  const submitButton = $('#loginSubmit'); submitButton.disabled = true; submitButton.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> Verificando acceso…';
+  try { const result = await api('/auth/login', { method: 'POST', body: JSON.stringify({ username: form.get('username'), password: form.get('password') }) }); state.user = result.user; showApp(); notify('Sesión iniciada. Bienvenido a Nova Salud.'); await refreshAll(); if (result.user.mustChangePassword) changePassword(); }
+  catch (error) { $('#loginError').textContent = error.message; notify(error.message, 'error'); $('#loginPassword').focus(); }
+  finally { submitButton.disabled = false; submitButton.innerHTML = 'Ingresar a Nova Salud <span>→</span>'; }
 });
 $('#logoutButton').addEventListener('click', async () => { try { await api('/auth/logout', { method: 'POST', body: '{}' }); } finally { state.cart.clear(); showLogin(); } });
 function changePassword() {

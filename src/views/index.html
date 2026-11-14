@@ -9,9 +9,14 @@
   <section class="login-screen" id="loginScreen" hidden>
     <div class="login-card">
       <a class="brand" href="#"><span class="brand-mark">✚</span><span><b>nova<span class="brand-light">salud</span></b><small>GESTIÓN DE BOTICA</small></span></a>
-      <div class="login-copy"><p class="eyebrow">PLATAFORMA DE GESTIÓN</p><h1>Todo en orden.<br><em>Todo más cerca.</em></h1><p>Administra tu inventario, atiende con agilidad y mantén el cuidado siempre al día.</p></div>
-      <form id="loginForm" class="stack-form"><label>Usuario<input name="username" autocomplete="username" value="admin" required minlength="3"></label><label>Contraseña<input name="password" type="password" autocomplete="current-password" placeholder="Ingresa tu contraseña" required></label><button class="button primary wide">Ingresar a Nova Salud <span>→</span></button><!--DEV_CREDENTIALS--><p class="form-note">Acceso exclusivo para administración.</p><p class="error-text" id="loginError" aria-live="polite"></p></form>
-    </div><div class="login-art"><div class="art-circle circle-one"></div><div class="art-circle circle-two"></div><div class="art-pill">✚</div><div class="art-caption"><span>BOTICA · INVENTARIO · VENTAS</span><p>Una atención que<br>se siente mejor.</p></div><div class="art-spark">✳</div></div>
+      <div class="login-copy"><p class="eyebrow">PLATAFORMA DE GESTIÓN</p><h1>Tu botica, en buenas manos<span class="heading-dot">.</span></h1><p>Inventario claro y una atención ágil para cada persona.</p></div>
+      <form id="loginForm" class="stack-form" novalidate>
+        <label for="loginUsername">Usuario</label><div class="login-input-wrap"><input id="loginUsername" name="username" autocomplete="username" value="admin" required minlength="3" maxlength="40" aria-describedby="usernameError"><small class="field-error" id="usernameError"></small></div>
+        <label for="loginPassword">Contraseña</label><div class="login-input-wrap password-wrap"><input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="Ingresa tu contraseña" required aria-describedby="passwordError"><button class="password-toggle" id="toggleLoginPassword" type="button" aria-label="Mostrar contraseña" aria-pressed="false">Mostrar</button><small class="field-error" id="passwordError"></small></div>
+        <button class="button primary wide login-submit" id="loginSubmit" type="submit">Ingresar a Nova Salud <span>→</span></button><!--DEV_CREDENTIALS--><p class="form-note"><span aria-hidden="true">◈</span> Acceso seguro exclusivo para administración.</p><p class="error-text login-error" id="loginError" role="alert" aria-live="polite"></p>
+      </form>
+    </div>
+    <aside class="login-art" aria-label="Interior de una botica Nova Salud"><img src="/images/botica-nova-salud.png" alt="Botica luminosa con productos de salud organizados en estantes"><div class="login-art-shade"></div><div class="art-caption"><span>BOTICA · INVENTARIO · VENTAS</span><p>Una atención más cercana,<br>todos los días.</p><small><span class="art-check">✓</span> Todo tu negocio, en un solo lugar</small></div><div class="login-art-badge"><span>✚</span> Cuidamos cada detalle</div></aside>
   </section>
 
   <div class="app-shell" id="appShell" hidden>
