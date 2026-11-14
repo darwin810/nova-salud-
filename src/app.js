@@ -1,4 +1,5 @@
 const path = require('node:path');
+const fs = require('node:fs');
 const express = require('express');
 const helmet = require('helmet');
 const { makeOriginGuard } = require('./middleware/origin');
@@ -11,7 +12,16 @@ function makeApp(config) {
   app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], scriptSrc: ["'self'"], styleSrc: ["'self'"], imgSrc: ["'self'", 'data:'], connectSrc: ["'self'"], objectSrc: ["'none'"], baseUri: ["'self'"], frameAncestors: ["'none'"] } }, crossOriginEmbedderPolicy: false }));
   app.use(express.json({ limit: '32kb', strict: true }));
   app.use('/api', makeOriginGuard(config.appOrigin), makeApiRouter(config));
-  app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'views', 'index.html')));
+  app.get('/', (req, res, next) => {
+    const viewPath = path.join(__dirname, 'views', 'index.html');
+    fs.readFile(viewPath, 'utf8', (error, html) => {
+      if (error) return next(error);
+      const demoHint = config.nodeEnv === 'development'
+        ? '<p class="dev-credential-hint">Demo local: <b>admin</b> / <b>123456</b>. Cambia la contraseña al ingresar.</p>'
+        : '';
+      return res.type('html').send(html.replace('<!--DEV_CREDENTIALS-->', demoHint));
+    });
+  });
   app.use(express.static(path.join(__dirname, '..', 'public'), { maxAge: config.nodeEnv === 'production' ? '1h' : 0 }));
   app.use((err, req, res, next) => {
     if (res.headersSent) return next(err);
