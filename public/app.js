@@ -75,12 +75,11 @@ function validateAccountPasswordField(field) {
   const errorId = { currentPassword: 'currentPasswordError', password: 'newAccountPasswordError', confirmation: 'confirmAccountPasswordError' }[field.name];
   const errorNode = $('#' + errorId);
   let message = '';
-  if (field.name === 'currentPassword' && !field.value) message = 'Escribe tu contraseña actual.';
   if (field.name === 'password') {
     if (!field.value) message = 'Escribe una contraseña nueva.';
     else if (field.value.length < 12) message = 'Usa al menos 12 caracteres.';
     else if (new TextEncoder().encode(field.value).length > 72) message = 'La contraseña supera el límite de 72 bytes.';
-    else if (field.value === $('#currentPassword').value) message = 'La nueva contraseña debe ser diferente a la actual.';
+    else if ($('#currentPassword').value && field.value === $('#currentPassword').value) message = 'La nueva contraseña debe ser diferente a la actual.';
   }
   if (field.name === 'confirmation' && field.value !== $('#newAccountPassword').value) message = 'Las contraseñas no coinciden.';
   field.setAttribute('aria-invalid', String(Boolean(message)));

@@ -24,7 +24,6 @@ function makeController(config) {
     changePassword: wrap(async (req, res) => {
       const parsed = passwordChangeInput.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ error: 'La nueva contraseña debe tener 12 o más caracteres y no exceder 72 bytes.' });
-      if (!req.user.mustChangePassword && !parsed.data.currentPassword) return res.status(400).json({ error: 'Ingresa tu contraseña actual para continuar.' });
       const changed = await authService.replacePassword(req.user._id, parsed.data.password, parsed.data.currentPassword);
       if (!changed) return res.status(401).json({ error: 'La contraseña actual no es correcta o la cuenta cambió. Vuelve a intentarlo.' });
       return res.json({ message: 'Contraseña actualizada.' });

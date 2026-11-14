@@ -16,7 +16,7 @@ test('verifica credenciales con hash bcrypt y no acepta una contraseña errónea
   } finally { User.findOne = original; }
 });
 
-test('exige la contraseña actual antes de cambiar una clave existente', async () => {
+test('permite dejar vacía la contraseña actual y verifica si se proporciona', async () => {
   const originalFindById = User.findById; const originalUpdateOne = User.updateOne;
   const currentHash = await bcrypt.hash('ClaveActual-1234', 4); let savedHash = null;
   User.findById = () => ({ select: async () => ({ passwordHash: currentHash, mustChangePassword: false }) });
@@ -24,7 +24,7 @@ test('exige la contraseña actual antes de cambiar una clave existente', async (
   try {
     assert.equal(await replacePassword('user-1', 'ClaveNueva-Segura-2026', 'incorrecta'), false);
     assert.equal(savedHash, null);
-    assert.equal(await replacePassword('user-1', 'ClaveNueva-Segura-2026', 'ClaveActual-1234'), true);
+    assert.equal(await replacePassword('user-1', 'ClaveNueva-Segura-2026'), true);
     assert.equal(await bcrypt.compare('ClaveNueva-Segura-2026', savedHash), true);
   } finally { User.findById = originalFindById; User.updateOne = originalUpdateOne; }
 });
