@@ -1,6 +1,6 @@
 # Nova Salud
 
-Aplicación web full stack para controlar el inventario, registrar ventas y agilizar la atención en una botica. Interfaz en español, precios en soles (PEN) y diseño adaptable a computador, tableta y celular.
+Aplicación web full stack para gestionar el inventario, registrar ventas y agilizar la atención en una botica. Interfaz en español, precios en soles (PEN) y diseño adaptable a computadoras, tabletas y celulares.
 
 ## Tecnologías
 
@@ -33,7 +33,7 @@ npm run dev
 
 `npm run dev` inicia automáticamente `mongod.exe` como una instancia local privada de Nova en el puerto `27018`, configura el replica set `rs0` y luego arranca el servidor web. No requiere `.env`, Docker ni comandos manuales de configuración de MongoDB. Los archivos de base de datos quedan en `data/mongodb/` dentro del proyecto y se conservan al cerrar el programa. El servicio MongoDB normal del equipo, si ya existe, no se modifica.
 
-Cuando aparezca `MongoDB listo: nova_salud` y `Nova Salud disponible en http://localhost:3000`, abre [http://localhost:3000](http://localhost:3000). Ingresa con **admin / 123456** y elige una nueva contraseña de al menos 12 caracteres. Esas credenciales son solo para desarrollo local.
+Cuando aparezca `MongoDB listo: nova_salud` y `Nova Salud disponible en http://localhost:3000`, abre [http://localhost:3000](http://localhost:3000). Ingresa con **admin / 123456**. Si deseas cambiar la contraseña, puedes hacerlo desde **Mi cuenta**. Estas credenciales son solo para desarrollo local.
 
 La primera ejecución crea la base `nova_salud`, las colecciones `usuarios`, `productos` y `ventas`, sus índices y el documento inicial del administrador. La contraseña se guarda como hash bcrypt; el catálogo comienza vacío para que registres los productos de prueba o de la botica.
 
@@ -62,7 +62,7 @@ En `development`, si la base aún no tiene administrador, Nova crea el acceso in
 
 ## Variables privadas
 
-Revisa `.env.example`. En producción configura `NODE_ENV=production`, `MONGODB_URI` con usuario de mínimo privilegio y TLS, `JWT_SECRET` generado aleatoriamente, `APP_ORIGIN` con el origen HTTPS público exacto y `ADMIN_USERNAME`/`ADMIN_PASSWORD` seguros para el administrador inicial. El cambio de contraseña se puede hacer luego desde **Mi cuenta**. En desarrollo, `npm run dev` inicia una instancia local de MongoDB en el puerto 27018 y, si falta `JWT_SECRET`, crea una clave temporal en memoria. No pongas secretos en `public/`, HTML ni scripts del navegador. Monta el servidor detrás de un proxy HTTPS correctamente configurado.
+Revisa `.env.example`. En producción configura `NODE_ENV=production`, `MONGODB_URI` con usuario de mínimo privilegio y TLS, `JWT_SECRET` generado aleatoriamente, `APP_ORIGIN` con el origen HTTPS público exacto y `ADMIN_USERNAME`/`ADMIN_PASSWORD` seguros para el administrador inicial. En desarrollo, `npm run dev` inicia una instancia local de MongoDB en el puerto 27018 y, si falta `JWT_SECRET`, crea una clave temporal en memoria. No pongas secretos en `public/`, HTML ni scripts del navegador. Monta el servidor detrás de un proxy HTTPS correctamente configurado.
 
 ## Base de datos y reglas de operación
 
@@ -70,7 +70,7 @@ Mongoose crea las colecciones e índices necesarios (`usuarios`, `productos`, `v
 
 ## Pruebas
 
-Ejecuta `npm run build` para revisar la sintaxis de los módulos JavaScript y `npm test` para las pruebas automatizadas de validación de productos y ventas, JWT/autenticación, hash bcrypt, cambio obligatorio de contraseña, protección de origen, cálculo de venta a partir del precio de catálogo y rechazo de existencias insuficientes. `npm run dev` inicia MongoDB local para la prueba manual del flujo completo.
+Ejecuta `npm run build` para revisar la sintaxis de los módulos JavaScript y `npm test` para las pruebas automatizadas de validación de productos y ventas, JWT/autenticación, hash bcrypt, cambio de contraseña, protección de origen, cálculo de venta a partir del precio de catálogo y rechazo de existencias insuficientes. `npm run dev` inicia MongoDB local para la prueba manual del flujo completo.
 
 ## Despliegue
 
