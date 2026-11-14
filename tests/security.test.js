@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { productInput, saleInput, credentialsInput, newPasswordInput, createAccessToken, verifyAccessToken, priceToCents } = require('../src/security');
+const { productInput, saleInput, credentialsInput, newPasswordInput, passwordChangeInput, createAccessToken, verifyAccessToken, priceToCents } = require('../src/security');
 const { User, Product, Sale } = require('../src/models');
 
 const secret = 'test-only-random-secret-for-nova-salud-0123456789';
@@ -26,6 +26,9 @@ test('autenticación firma JWT con expiración y rechaza firmas incorrectas', ()
   assert.equal(credentialsInput.safeParse({ username: 'admin', password: '123456' }).success, true);
   assert.equal(newPasswordInput.safeParse('123456').success, false);
   assert.equal(newPasswordInput.safeParse('FraseSegura-Nova-2026').success, true);
+  assert.equal(passwordChangeInput.safeParse({ password: 'FraseSegura-Nova-2026' }).success, true);
+  assert.equal(passwordChangeInput.safeParse({ currentPassword: 'actual', password: 'FraseSegura-Nova-2026' }).success, true);
+  assert.equal(passwordChangeInput.safeParse({ password: 'corta' }).success, false);
 });
 
 test('MongoDB usa colecciones en español y excluye el hash de consultas de usuario', () => {

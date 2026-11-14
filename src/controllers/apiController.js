@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { User, Product, Sale } = require('../models');
-const { productInput, saleInput, credentialsInput, newPasswordInput, createAccessToken } = require('../security');
+const { productInput, saleInput, credentialsInput, passwordChangeInput, createAccessToken } = require('../security');
 const authService = require('../services/authService');
 const inventoryService = require('../services/inventoryService');
 const salesService = require('../services/salesService');
@@ -22,9 +22,11 @@ function makeController(config) {
     logout: (req, res) => { res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: undefined }); res.status(204).end(); },
     me: (req, res) => res.json({ user: { username: req.user.username, mustChangePassword: req.user.mustChangePassword } }),
     changePassword: wrap(async (req, res) => {
-      const parsed = newPasswordInput.safeParse(req.body?.password);
+      const parsed = passwordChangeInput.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ error: 'La nueva contraseña debe tener 12 o más caracteres y no exceder 72 bytes.' });
-      await authService.replacePassword(req.user._id, parsed.data);
+      if (!req.user.mustChangePassword && !parsed.data.currentPassword) return res.status(400).json({ error: 'Ingresa tu contraseña actual para continuar.' });
+      const changed = await authService.replacePassword(req.user._id, parsed.data.password, parsed.data.currentPassword);
+      if (!changed) return res.status(401).json({ error: 'La contraseña actual no es correcta o la cuenta cambió. Vuelve a intentarlo.' });
       return res.json({ message: 'Contraseña actualizada.' });
     }),
     dashboard: wrap(async (req, res) => {

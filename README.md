@@ -55,7 +55,8 @@ Para producción no uses este iniciador local: configura `NODE_ENV=production`, 
 2. En **Nueva venta**, agrega una unidad, escribe opcionalmente un cliente y confirma. Verifica que el total sea `S/ 10.50` y que el inventario ahora muestre `4`.
 3. En **Historial de ventas**, comprueba que aparezca la venta con su detalle y total.
 4. Edita el producto y deja el stock en `2`; debe aparecer en el panel de reposición. Si lo dejas en `0`, debe marcarse como agotado.
-5. Para revisar MongoDB, ejecuta `mongosh "mongodb://localhost:27018/nova_salud?replicaSet=rs0"`, luego `show collections` y `db.usuarios.find()`.
+5. En **Mi cuenta**, cambia la contraseña ingresando primero la clave actual y confirmando dos veces la nueva (mínimo 12 caracteres).
+6. Para revisar MongoDB, ejecuta `mongosh "mongodb://localhost:27018/nova_salud?replicaSet=rs0"`, luego `show collections` y `db.usuarios.find()`.
 
 En `development`, si la base aún no tiene administrador, Nova crea el acceso inicial solicitado: **usuario `admin`, contraseña `123456`**. El sistema fuerza el cambio inmediato a una contraseña de al menos 12 caracteres. Esta credencial solo se proporciona para desarrollo local; nunca uses esa contraseña en un entorno público.
 

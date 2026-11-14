@@ -26,6 +26,7 @@ const credentialsInput = z.object({
   password: passwordBytesInput,
 }).strict();
 const newPasswordInput = z.string().min(12).max(72).refine((password) => Buffer.byteLength(password, 'utf8') <= 72);
+const passwordChangeInput = z.object({ currentPassword: passwordBytesInput.optional(), password: newPasswordInput }).strict();
 
 function createAccessToken(user, secret) {
   return jwt.sign({ sub: String(user._id), role: 'admin' }, secret, { expiresIn: '8h', issuer: 'nova-salud', audience: 'nova-salud-web' });
@@ -39,4 +40,4 @@ function priceToCents(price) {
   return Math.round(price * 100);
 }
 
-module.exports = { productInput, saleInput, credentialsInput, newPasswordInput, createAccessToken, verifyAccessToken, priceToCents };
+module.exports = { productInput, saleInput, credentialsInput, newPasswordInput, passwordChangeInput, createAccessToken, verifyAccessToken, priceToCents };

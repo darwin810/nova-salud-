@@ -20,10 +20,10 @@ function productIcon(name) { return ['✚', '◈', '✿', '◉'][(name || '').ch
 function productNameCell(p) { return `<span class="product-cell"><span class="product-thumb ${thumbColor(p.name)}">${productIcon(p.name)}</span>${esc(p.name)}</span>`; }
 
 function showLogin() { loginScreen.hidden = false; appShell.hidden = true; }
-function showApp() { loginScreen.hidden = true; appShell.hidden = false; $('#profileName').textContent = state.user.username; }
+function showApp() { loginScreen.hidden = true; appShell.hidden = false; $('#profileName').textContent = state.user.username; $('#accountUsername').textContent = state.user.username; }
 async function boot() {
   $('#todayDate').textContent = new Intl.DateTimeFormat('es-PE', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date());
-  try { const { user } = await api('/auth/me'); state.user = user; showApp(); await refreshAll(); if (user.mustChangePassword) changePassword(); }
+  try { const { user } = await api('/auth/me'); state.user = user; showApp(); if (user.mustChangePassword) changePassword(); else await refreshAll(); }
   catch { showLogin(); }
 }
 function validateLoginField(field) {
@@ -59,7 +59,7 @@ $('#loginForm').addEventListener('submit', async (event) => {
   if (!valid) { loginFields.find((field) => field.getAttribute('aria-invalid') === 'true')?.focus(); return; }
   const form = new FormData(event.currentTarget);
   const submitButton = $('#loginSubmit'); submitButton.disabled = true; submitButton.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> Verificando acceso…';
-  try { const result = await api('/auth/login', { method: 'POST', body: JSON.stringify({ username: form.get('username'), password: form.get('password') }) }); state.user = result.user; showApp(); notify('Sesión iniciada. Bienvenido a Nova Salud.'); await refreshAll(); if (result.user.mustChangePassword) changePassword(); }
+  try { const result = await api('/auth/login', { method: 'POST', body: JSON.stringify({ username: form.get('username'), password: form.get('password') }) }); state.user = result.user; showApp(); notify('Sesión iniciada. Bienvenido a Nova Salud.'); if (result.user.mustChangePassword) changePassword(); else await refreshAll(); }
   catch (error) { $('#loginError').textContent = error.message; notify(error.message, 'error'); $('#loginPassword').focus(); }
   finally { submitButton.disabled = false; submitButton.innerHTML = 'Ingresar a Nova Salud <span>→</span>'; }
 });
@@ -68,6 +68,47 @@ function changePassword() {
   const dialog = document.createElement('dialog'); dialog.className = 'modal'; dialog.innerHTML = `<form><div class="modal-heading"><div><p class="eyebrow">PROTEGE TU CUENTA</p><h2>Crea una contraseña segura</h2><p>La clave inicial debe cambiarse antes de usar el sistema.</p></div></div><label class="stack-form">Nueva contraseña<input name="password" type="password" minlength="12" maxlength="72" required autocomplete="new-password" placeholder="Mínimo 12 caracteres"></label><p class="error-text" aria-live="polite"></p><div class="modal-actions"><button class="button primary">Actualizar y continuar →</button></div></form>`;
   document.body.append(dialog); dialog.showModal(); dialog.querySelector('form').addEventListener('submit', async (e) => { e.preventDefault(); const password = new FormData(e.currentTarget).get('password'); try { await api('/auth/change-password', { method: 'POST', body: JSON.stringify({ password }) }); state.user.mustChangePassword = false; dialog.close(); dialog.remove(); notify('Contraseña actualizada. Ya puedes trabajar.'); await refreshAll(); } catch (error) { dialog.querySelector('.error-text').textContent = error.message; } });
 }
+
+const accountPasswordForm = $('#accountPasswordForm');
+const accountPasswordFields = [...accountPasswordForm.querySelectorAll('input')];
+function validateAccountPasswordField(field) {
+  const errorId = { currentPassword: 'currentPasswordError', password: 'newAccountPasswordError', confirmation: 'confirmAccountPasswordError' }[field.name];
+  const errorNode = $('#' + errorId);
+  let message = '';
+  if (field.name === 'currentPassword' && !field.value) message = 'Escribe tu contraseña actual.';
+  if (field.name === 'password') {
+    if (!field.value) message = 'Escribe una contraseña nueva.';
+    else if (field.value.length < 12) message = 'Usa al menos 12 caracteres.';
+    else if (new TextEncoder().encode(field.value).length > 72) message = 'La contraseña supera el límite de 72 bytes.';
+    else if (field.value === $('#currentPassword').value) message = 'La nueva contraseña debe ser diferente a la actual.';
+  }
+  if (field.name === 'confirmation' && field.value !== $('#newAccountPassword').value) message = 'Las contraseñas no coinciden.';
+  field.setAttribute('aria-invalid', String(Boolean(message)));
+  errorNode.textContent = message;
+  return !message;
+}
+accountPasswordFields.forEach((field) => {
+  field.addEventListener('blur', () => { field.dataset.touched = 'true'; validateAccountPasswordField(field); });
+  field.addEventListener('input', () => {
+    if (field.dataset.touched) validateAccountPasswordField(field);
+    if (field.name === 'password' && $('#confirmAccountPassword').dataset.touched) validateAccountPasswordField($('#confirmAccountPassword'));
+    $('#accountPasswordError').textContent = '';
+  });
+});
+accountPasswordForm.addEventListener('submit', async (event) => {
+  event.preventDefault(); $('#accountPasswordError').textContent = '';
+  const valid = accountPasswordFields.map((field) => { field.dataset.touched = 'true'; return validateAccountPasswordField(field); }).every(Boolean);
+  if (!valid) { accountPasswordFields.find((field) => field.getAttribute('aria-invalid') === 'true')?.focus(); return; }
+  const form = new FormData(accountPasswordForm); const button = $('#accountPasswordSubmit');
+  button.disabled = true; button.textContent = 'Actualizando…';
+  try {
+    await api('/auth/change-password', { method: 'POST', body: JSON.stringify({ currentPassword: form.get('currentPassword'), password: form.get('password') }) });
+    accountPasswordForm.reset(); accountPasswordFields.forEach((field) => { field.dataset.touched = ''; field.removeAttribute('aria-invalid'); });
+    document.querySelectorAll('#accountPasswordForm .field-error').forEach((node) => { node.textContent = ''; });
+    notify('Contraseña actualizada correctamente.');
+  } catch (error) { $('#accountPasswordError').textContent = error.message; notify(error.message, 'error'); }
+  finally { button.disabled = false; button.innerHTML = 'Actualizar contraseña <span>→</span>'; }
+});
 
 async function refreshAll() { await Promise.all([loadDashboard(), loadProducts()]); if (state.view === 'historial') await loadSales(); }
 async function loadDashboard() {
@@ -105,7 +146,7 @@ function renderCart() {
 function go(view, restock = false) {
   state.view = view; state.restock = restock; document.querySelectorAll('.view').forEach((node) => node.classList.toggle('active', node.id === 'view-' + view));
   document.querySelectorAll('.nav-link').forEach((node) => node.classList.toggle('active', node.dataset.view === view));
-  const titles = { inicio: 'Resumen', inventario: 'Inventario', ventas: 'Nueva venta', historial: 'Historial de ventas' };
+  const titles = { inicio: 'Resumen', inventario: 'Inventario', ventas: 'Nueva venta', historial: 'Historial de ventas', cuenta: 'Mi cuenta' };
   $('#crumbTitle').textContent = titles[view]; $('#sidebar').classList.remove('open');
   if (view === 'inventario') { $('#restockFilter').checked = restock; loadProducts(); }
   if (view === 'ventas') { loadProducts(); renderCart(); }

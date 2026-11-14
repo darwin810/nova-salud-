@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const { User } = require('../src/models');
 const { makeAuth, requirePasswordChangeCompleted } = require('../src/middleware/auth');
 const { makeOriginGuard } = require('../src/middleware/origin');
-const { verifyCredentials } = require('../src/services/authService');
+const { verifyCredentials, replacePassword } = require('../src/services/authService');
 
 test('verifica credenciales con hash bcrypt y no acepta una contraseña errónea', async () => {
   const original = User.findOne;
@@ -14,6 +14,30 @@ test('verifica credenciales con hash bcrypt y no acepta una contraseña errónea
     assert.equal((await verifyCredentials('ADMIN', 'clave-larga-de-prueba')).username, 'admin');
     assert.equal(await verifyCredentials('admin', 'incorrecta'), null);
   } finally { User.findOne = original; }
+});
+
+test('exige la contraseña actual antes de cambiar una clave existente', async () => {
+  const originalFindById = User.findById; const originalUpdateOne = User.updateOne;
+  const currentHash = await bcrypt.hash('ClaveActual-1234', 4); let savedHash = null;
+  User.findById = () => ({ select: async () => ({ passwordHash: currentHash, mustChangePassword: false }) });
+  User.updateOne = async (filter, update) => { assert.equal(filter.passwordHash, currentHash); savedHash = update.$set.passwordHash; return { modifiedCount: 1 }; };
+  try {
+    assert.equal(await replacePassword('user-1', 'ClaveNueva-Segura-2026', 'incorrecta'), false);
+    assert.equal(savedHash, null);
+    assert.equal(await replacePassword('user-1', 'ClaveNueva-Segura-2026', 'ClaveActual-1234'), true);
+    assert.equal(await bcrypt.compare('ClaveNueva-Segura-2026', savedHash), true);
+  } finally { User.findById = originalFindById; User.updateOne = originalUpdateOne; }
+});
+
+test('permite definir la contraseña inicial obligatoria sin pedir una clave anterior', async () => {
+  const originalFindById = User.findById; const originalUpdateOne = User.updateOne;
+  let savedHash = null;
+  User.findById = () => ({ select: async () => ({ passwordHash: 'hash-inicial', mustChangePassword: true }) });
+  User.updateOne = async (_filter, update) => { savedHash = update.$set.passwordHash; return { modifiedCount: 1 }; };
+  try {
+    assert.equal(await replacePassword('user-1', 'ClaveNueva-Segura-2026'), true);
+    assert.equal(await bcrypt.compare('ClaveNueva-Segura-2026', savedHash), true);
+  } finally { User.findById = originalFindById; User.updateOne = originalUpdateOne; }
 });
 
 test('el middleware bloquea rutas sin sesión y fuerza cambiar la contraseña inicial', async () => {
