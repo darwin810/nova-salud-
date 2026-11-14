@@ -23,7 +23,7 @@ function showLogin() { loginScreen.hidden = false; appShell.hidden = true; }
 function showApp() { loginScreen.hidden = true; appShell.hidden = false; $('#profileName').textContent = state.user.username; $('#accountUsername').textContent = state.user.username; }
 async function boot() {
   $('#todayDate').textContent = new Intl.DateTimeFormat('es-PE', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date());
-  try { const { user } = await api('/auth/me'); state.user = user; showApp(); if (user.mustChangePassword) changePassword(); else await refreshAll(); }
+  try { const { user } = await api('/auth/me'); state.user = user; showApp(); await refreshAll(); }
   catch { showLogin(); }
 }
 function validateLoginField(field) {
@@ -59,16 +59,11 @@ $('#loginForm').addEventListener('submit', async (event) => {
   if (!valid) { loginFields.find((field) => field.getAttribute('aria-invalid') === 'true')?.focus(); return; }
   const form = new FormData(event.currentTarget);
   const submitButton = $('#loginSubmit'); submitButton.disabled = true; submitButton.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> Verificando acceso…';
-  try { const result = await api('/auth/login', { method: 'POST', body: JSON.stringify({ username: form.get('username'), password: form.get('password') }) }); state.user = result.user; showApp(); notify('Sesión iniciada. Bienvenido a Nova Salud.'); if (result.user.mustChangePassword) changePassword(); else await refreshAll(); }
+  try { const result = await api('/auth/login', { method: 'POST', body: JSON.stringify({ username: form.get('username'), password: form.get('password') }) }); state.user = result.user; showApp(); notify('Sesión iniciada. Bienvenido a Nova Salud.'); await refreshAll(); }
   catch (error) { $('#loginError').textContent = error.message; notify(error.message, 'error'); $('#loginPassword').focus(); }
   finally { submitButton.disabled = false; submitButton.innerHTML = 'Ingresar a Nova Salud <span>→</span>'; }
 });
 $('#logoutButton').addEventListener('click', async () => { try { await api('/auth/logout', { method: 'POST', body: '{}' }); } finally { state.cart.clear(); showLogin(); } });
-function changePassword() {
-  const dialog = document.createElement('dialog'); dialog.className = 'modal'; dialog.innerHTML = `<form><div class="modal-heading"><div><p class="eyebrow">PROTEGE TU CUENTA</p><h2>Crea una contraseña segura</h2><p>La clave inicial debe cambiarse antes de usar el sistema.</p></div></div><label class="stack-form">Nueva contraseña<input name="password" type="password" minlength="12" maxlength="72" required autocomplete="new-password" placeholder="Mínimo 12 caracteres"></label><p class="error-text" aria-live="polite"></p><div class="modal-actions"><button class="button primary">Actualizar y continuar →</button></div></form>`;
-  document.body.append(dialog); dialog.showModal(); dialog.querySelector('form').addEventListener('submit', async (e) => { e.preventDefault(); const password = new FormData(e.currentTarget).get('password'); try { await api('/auth/change-password', { method: 'POST', body: JSON.stringify({ password }) }); state.user.mustChangePassword = false; dialog.close(); dialog.remove(); notify('Contraseña actualizada. Ya puedes trabajar.'); await refreshAll(); } catch (error) { dialog.querySelector('.error-text').textContent = error.message; } });
-}
-
 const accountPasswordForm = $('#accountPasswordForm');
 const accountPasswordFields = [...accountPasswordForm.querySelectorAll('input')];
 function validateAccountPasswordField(field) {

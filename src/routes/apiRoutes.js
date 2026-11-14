@@ -1,7 +1,7 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const { makeController } = require('../controllers/apiController');
-const { makeAuth, requirePasswordChangeCompleted } = require('../middleware/auth');
+const { makeAuth } = require('../middleware/auth');
 
 function makeApiRouter(config) {
   const router = express.Router(); const controller = makeController(config); const auth = makeAuth(config.jwtSecret);
@@ -12,7 +12,7 @@ function makeApiRouter(config) {
   router.post('/auth/logout', controller.logout);
   router.get('/auth/me', auth, controller.me);
   router.post('/auth/change-password', auth, controller.changePassword);
-  router.use(auth, requirePasswordChangeCompleted, writeLimiter);
+  router.use(auth, writeLimiter);
   router.get('/dashboard', controller.dashboard);
   router.get('/products', controller.listProducts);
   router.post('/products', controller.createProduct);

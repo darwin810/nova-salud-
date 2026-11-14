@@ -45,8 +45,8 @@ async function seedInitialAdmin() {
   }
   const passwordHash = await bcrypt.hash(password, 12);
   try {
-    await User.create({ username, passwordHash, mustChangePassword: true });
-    console.log(`Administrador inicial "${username}" creado; cambia la contraseña al ingresar.`);
+    await User.create({ username, passwordHash, mustChangePassword: false });
+    console.log(`Administrador inicial "${username}" creado.`);
   } catch (error) {
     if (error.code !== 11000) throw error;
   }

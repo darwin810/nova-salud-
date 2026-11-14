@@ -17,9 +17,4 @@ function makeAuth(jwtSecret) {
   };
 }
 
-function requirePasswordChangeCompleted(req, res, next) {
-  if (req.user.mustChangePassword) return res.status(428).json({ error: 'Cambia la contraseña inicial antes de continuar.', code: 'PASSWORD_CHANGE_REQUIRED' });
-  return next();
-}
-
-module.exports = { makeAuth, requirePasswordChangeCompleted, COOKIE_NAME };
+module.exports = { makeAuth, COOKIE_NAME };

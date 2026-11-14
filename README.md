@@ -58,11 +58,11 @@ Para producción no uses este iniciador local: configura `NODE_ENV=production`, 
 5. En **Mi cuenta**, puedes ingresar la contraseña actual (opcional) y confirmar dos veces la nueva (mínimo 12 caracteres).
 6. Para revisar MongoDB, ejecuta `mongosh "mongodb://localhost:27018/nova_salud?replicaSet=rs0"`, luego `show collections` y `db.usuarios.find()`.
 
-En `development`, si la base aún no tiene administrador, Nova crea el acceso inicial solicitado: **usuario `admin`, contraseña `123456`**. El sistema fuerza el cambio inmediato a una contraseña de al menos 12 caracteres. Esta credencial solo se proporciona para desarrollo local; nunca uses esa contraseña en un entorno público.
+En `development`, si la base aún no tiene administrador, Nova crea el acceso inicial solicitado: **usuario `admin`, contraseña `123456`**. El cambio de contraseña es opcional y puedes hacerlo en cualquier momento desde **Mi cuenta**. Esta credencial solo se proporciona para desarrollo local; nunca uses esa contraseña en un entorno público.
 
 ## Variables privadas
 
-Revisa `.env.example`. En producción configura `NODE_ENV=production`, `MONGODB_URI` con usuario de mínimo privilegio y TLS, `JWT_SECRET` generado aleatoriamente, `APP_ORIGIN` con el origen HTTPS público exacto y `ADMIN_USERNAME`/`ADMIN_PASSWORD` seguros para el administrador inicial. El servidor exige una contraseña inicial de al menos 12 caracteres en producción y fuerza el cambio tras el primer ingreso. En desarrollo, `npm run dev` inicia una instancia local de MongoDB en el puerto 27018 y, si falta `JWT_SECRET`, crea una clave temporal en memoria. No pongas secretos en `public/`, HTML ni scripts del navegador. Monta el servidor detrás de un proxy HTTPS correctamente configurado.
+Revisa `.env.example`. En producción configura `NODE_ENV=production`, `MONGODB_URI` con usuario de mínimo privilegio y TLS, `JWT_SECRET` generado aleatoriamente, `APP_ORIGIN` con el origen HTTPS público exacto y `ADMIN_USERNAME`/`ADMIN_PASSWORD` seguros para el administrador inicial. El cambio de contraseña se puede hacer luego desde **Mi cuenta**. En desarrollo, `npm run dev` inicia una instancia local de MongoDB en el puerto 27018 y, si falta `JWT_SECRET`, crea una clave temporal en memoria. No pongas secretos en `public/`, HTML ni scripts del navegador. Monta el servidor detrás de un proxy HTTPS correctamente configurado.
 
 ## Base de datos y reglas de operación
 

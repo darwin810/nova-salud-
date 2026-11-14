@@ -2,9 +2,10 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const bcrypt = require('bcryptjs');
 const { User } = require('../src/models');
-const { makeAuth, requirePasswordChangeCompleted } = require('../src/middleware/auth');
+const { makeAuth } = require('../src/middleware/auth');
 const { makeOriginGuard } = require('../src/middleware/origin');
 const { verifyCredentials, replacePassword } = require('../src/services/authService');
+const { createAccessToken } = require('../src/security');
 
 test('verifica credenciales con hash bcrypt y no acepta una contraseña errónea', async () => {
   const original = User.findOne;
@@ -29,7 +30,7 @@ test('permite dejar vacía la contraseña actual y verifica si se proporciona', 
   } finally { User.findById = originalFindById; User.updateOne = originalUpdateOne; }
 });
 
-test('permite definir la contraseña inicial obligatoria sin pedir una clave anterior', async () => {
+test('permite cambiar la contraseña aunque la cuenta antigua marque cambio pendiente', async () => {
   const originalFindById = User.findById; const originalUpdateOne = User.updateOne;
   let savedHash = null;
   User.findById = () => ({ select: async () => ({ passwordHash: 'hash-inicial', mustChangePassword: true }) });
@@ -40,15 +41,19 @@ test('permite definir la contraseña inicial obligatoria sin pedir una clave ant
   } finally { User.findById = originalFindById; User.updateOne = originalUpdateOne; }
 });
 
-test('el middleware bloquea rutas sin sesión y fuerza cambiar la contraseña inicial', async () => {
-  const auth = makeAuth('test-secret-that-is-long-enough-for-auth-test-123');
+test('el middleware protege sin sesión y deja entrar al usuario autenticado aunque tenga cambio pendiente', async () => {
+  const secret = 'test-secret-that-is-long-enough-for-auth-test-123'; const auth = makeAuth(secret);
   let status; let body;
   await auth({ headers: {}, get: () => undefined }, { status: (value) => { status = value; return { json: (valueBody) => { body = valueBody; } }; } }, () => assert.fail('No debe permitir pasar sin sesión.'));
   assert.equal(status, 401);
   assert.match(body.error, /Inicia sesión/);
-  let changeStatus;
-  requirePasswordChangeCompleted({ user: { mustChangePassword: true } }, { status: (value) => { changeStatus = value; return { json: () => {} }; } }, () => assert.fail('Debe exigir cambio de contraseña.'));
-  assert.equal(changeStatus, 428);
+  const originalFindById = User.findById; let allowed = false;
+  User.findById = () => ({ select: async () => ({ _id: 'admin-id', username: 'admin', mustChangePassword: true }) });
+  try {
+    const token = createAccessToken({ _id: 'admin-id' }, secret);
+    await auth({ headers: { cookie: `nova_session=${token}` }, get: () => undefined }, { status: () => assert.fail('No debe rechazar una sesión válida.') }, () => { allowed = true; });
+    assert.equal(allowed, true);
+  } finally { User.findById = originalFindById; }
 });
 
 test('el guard de origen rechaza solicitudes de escritura externas', () => {

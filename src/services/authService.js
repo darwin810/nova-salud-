@@ -10,7 +10,7 @@ async function verifyCredentials(username, password) {
 async function replacePassword(userId, password, currentPassword) {
   const user = await User.findById(userId).select('+passwordHash');
   if (!user) return false;
-  if (!user.mustChangePassword && currentPassword && !(await bcrypt.compare(currentPassword, user.passwordHash))) return false;
+  if (currentPassword && !(await bcrypt.compare(currentPassword, user.passwordHash))) return false;
   const passwordHash = await bcrypt.hash(password, 12);
   const result = await User.updateOne({ _id: userId, passwordHash: user.passwordHash }, { $set: { passwordHash, mustChangePassword: false } });
   return result.modifiedCount === 1;
