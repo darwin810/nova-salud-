@@ -65,6 +65,8 @@ Luego ejecuta `npm run dev`. Debe aparecer `MongoDB listo: nova_salud` y `Nova S
 
 Si el paso de `mongosh` indica que no hay servidor, inicia el servicio MongoDB. Si indica que el servidor no es miembro de un replica set, configura `replication.replSetName: rs0` en el archivo `mongod.cfg` y reinicia el servicio de MongoDB antes de volver a ejecutar la inicialización. La transacción de venta requiere ese modo de MongoDB.
 
+**Diferencia importante:** `mongod` es el servidor de base de datos; `mongosh` es solo una consola cliente. Abrir `mongosh` no inicia MongoDB. Si `npm run dev` muestra que no encuentra `mongod`, inicia el servicio MongoDB desde la aplicación **Servicios** de Windows. Si no aparece ese servicio, instala MongoDB Community Server. Una vez que el servidor esté escuchando en `127.0.0.1:27017` y configurado como replica set `rs0`, inicia Nova con `npm run dev`; Nova crea el usuario, la base y las colecciones automáticamente.
+
 En `development`, si la base aún no tiene administrador, Nova crea el acceso inicial solicitado: **usuario `admin`, contraseña `123456`**. El sistema fuerza el cambio inmediato a una contraseña de al menos 12 caracteres. Esta credencial solo se proporciona para desarrollo local; nunca uses esa contraseña en un entorno público.
 
 ## Variables privadas

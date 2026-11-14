@@ -25,7 +25,7 @@ async function main() {
   } catch {
     throw new Error(config.nodeEnv === 'production'
       ? 'No se pudo conectar a MongoDB. Revisa MONGODB_URI y el acceso de red.'
-      : 'No se pudo conectar a MongoDB local. Inicia MongoDB en 127.0.0.1:27017 como replica set rs0 y vuelve a ejecutar npm run dev.');
+      : 'No se encontró MongoDB Server (mongod) en 127.0.0.1:27017. mongosh solo es la consola; inicia el servicio MongoDB y configúralo como replica set rs0. Después vuelve a ejecutar npm run dev.');
   }
   await seedInitialAdmin();
   const app = makeApp(config);
