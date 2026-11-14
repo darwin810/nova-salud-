@@ -9,7 +9,7 @@ const { User } = require('./models');
 const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: Number(process.env.PORT || 3000),
-  mongoUri: process.env.MONGODB_URI || (process.env.NODE_ENV === 'production' ? '' : 'mongodb://127.0.0.1:27017/nova_salud?replicaSet=rs0'),
+  mongoUri: process.env.MONGODB_URI || (process.env.NODE_ENV === 'production' ? '' : 'mongodb://127.0.0.1:27018/nova_salud?replicaSet=rs0'),
   jwtSecret: process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? '' : crypto.randomBytes(48).toString('hex')),
   appOrigin: process.env.APP_ORIGIN || 'http://localhost:3000',
 };

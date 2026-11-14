@@ -6,7 +6,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
+    "dev": "node scripts/dev.js",
     "build": "node scripts/build-check.js",
     "test": "node --test",
     "test:watch": "node --test --watch"
