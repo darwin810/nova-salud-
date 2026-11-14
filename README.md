@@ -10,6 +10,10 @@ Aplicación web full stack para controlar el inventario, registrar ventas y agil
 - **Seguridad:** JWT firmado, cookies `HttpOnly`/`SameSite=Strict`, `Secure` en producción, contraseñas con bcrypt (12 rondas), Helmet, CSP, validación con Zod, protección de origen, límite de intentos y control optimista de versiones.
 - **Arquitectura MVC por capas:** `src/models` define los modelos MongoDB; `src/views` contiene la vista HTML; `src/routes` mapea los endpoints; `src/controllers` recibe la petición y responde; `src/services` concentra autenticación, inventario y ventas; `src/middleware` aplica autenticación y protección de origen.
 
+## Diagrama de propuesta
+
+![Diagrama de la propuesta de solución de Nova Salud](docs/diagrama-propuesta-nova-salud.svg)
+
 ## Requisitos
 
 - Node.js 20+ y npm.

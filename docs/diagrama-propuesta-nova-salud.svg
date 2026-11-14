@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="940" viewBox="0 0 1440 940" role="img" aria-labelledby="title description">
+  <title id="title">Diagrama de propuesta de solución para Nova Salud</title>
+  <desc id="description">Flujo desde los problemas de control manual, a través del sistema web Nova Salud y sus módulos de inventario y ventas, hasta los resultados esperados.</desc>
+  <defs>
+    <linearGradient id="header" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#0c786f"/><stop offset="1" stop-color="#155d57"/></linearGradient>
+    <linearGradient id="solution" x1="0" x2="1"><stop offset="0" stop-color="#eaf7f3"/><stop offset="1" stop-color="#f2faf7"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#164b45" flood-opacity=".10"/></filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M1 1 L11 6 L1 11" fill="none" stroke="#41a393" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <style>
+      text{font-family:Inter,'Segoe UI',Arial,sans-serif;fill:#183d3a}.kicker{font-size:15px;font-weight:700;letter-spacing:2.1px;fill:#6a8982}.title{font-size:38px;font-weight:750;letter-spacing:-1.1px}.subtitle{font-size:18px;fill:#708580}.card-title{font-size:19px;font-weight:700}.body{font-size:16px;fill:#607771}.small{font-size:14px;fill:#718680}.white{fill:#fff}.teal{fill:#11776e}.blue{fill:#2a83a5}.orange{fill:#b56637}.bullet{font-size:16px;fill:#365650}.number{font-size:13px;font-weight:800;fill:#13766e}
+    </style>
+  </defs>
+  <rect width="1440" height="940" rx="28" fill="#f5f9f7"/>
+  <circle cx="1325" cy="104" r="100" fill="#e8f4ef"/><circle cx="1325" cy="104" r="65" fill="none" stroke="#d4e9e1" stroke-width="2"/>
+  <g transform="translate(68 58)"><rect width="46" height="46" rx="15" fill="#dff2eb"/><path d="M19 9h9v10h10v9H28v10h-9V28H9v-9h10z" fill="#118075"/></g>
+  <text x="128" y="77" class="kicker">PROPUESTA DE SOLUCIÓN · BOTICA</text>
+  <text x="128" y="122" class="title">Nova Salud</text>
+  <text x="128" y="153" class="subtitle">Gestión centralizada de inventario, ventas y atención al cliente</text>
+
+  <!-- Problema -->
+  <g filter="url(#shadow)"><rect x="55" y="226" width="326" height="410" rx="22" fill="#fff" stroke="#f0e5dc"/></g>
+  <rect x="55" y="226" width="326" height="74" rx="22" fill="#fff3e9"/><path d="M55 278h326v22H55z" fill="#fff3e9"/>
+  <circle cx="91" cy="263" r="17" fill="#fae0cc"/><path d="M91 252v13m0 7v1" stroke="#b56637" stroke-width="3.2" stroke-linecap="round"/>
+  <text x="120" y="270" class="card-title orange">PROBLEMÁTICA</text>
+  <text x="82" y="345" class="body" font-weight="700">Control manual de la botica</text>
+  <circle cx="86" cy="386" r="4" fill="#d18355"/><text x="102" y="392" class="bullet">Errores al actualizar el stock</text>
+  <circle cx="86" cy="435" r="4" fill="#d18355"/><text x="102" y="441" class="bullet">Productos agotados sin aviso</text>
+  <circle cx="86" cy="484" r="4" fill="#d18355"/><text x="102" y="490" class="bullet">Largas esperas en la atención</text>
+  <circle cx="86" cy="533" r="4" fill="#d18355"/><text x="102" y="539" class="bullet">Ventas difíciles de consultar</text>
+  <rect x="82" y="572" width="272" height="38" rx="11" fill="#fff7f1"/><text x="98" y="597" class="small orange" font-weight="700">Necesidad: ordenar y agilizar</text>
+
+  <!-- Flecha problema a sistema -->
+  <path d="M392 432h42" stroke="#41a393" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <!-- Sistema central -->
+  <g filter="url(#shadow)"><rect x="446" y="190" width="548" height="482" rx="24" fill="url(#solution)" stroke="#d9ece5" stroke-width="2"/></g>
+  <rect x="446" y="190" width="548" height="78" rx="24" fill="url(#header)"/><path d="M446 245h548v23H446z" fill="#155d57"/>
+  <text x="720" y="222" text-anchor="middle" class="kicker white">SISTEMA WEB</text>
+  <text x="720" y="251" text-anchor="middle" font-size="23" font-weight="750" class="white">NOVA SALUD</text>
+
+  <!-- Módulos -->
+  <rect x="474" y="292" width="235" height="153" rx="17" fill="#fff" stroke="#dcece6"/>
+  <circle cx="507" cy="327" r="17" fill="#e1f3ed"/><path d="M501 327h12m-6-6v12" stroke="#148074" stroke-width="2.6" stroke-linecap="round"/>
+  <text x="535" y="333" class="card-title">Inventario</text>
+  <text x="495" y="371" class="small">• Productos y categorías</text>
+  <text x="495" y="397" class="small">• Precio y existencias</text>
+  <text x="495" y="423" class="small">• Alertas de reposición</text>
+
+  <rect x="731" y="292" width="235" height="153" rx="17" fill="#fff" stroke="#dcece6"/>
+  <circle cx="764" cy="327" r="17" fill="#e6f1f6"/><path d="M756 322h16v11h-16zM759 319h10m-7 17h4" stroke="#2a83a5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="792" y="333" class="card-title">Ventas</text>
+  <text x="752" y="371" class="small">• Búsqueda y carrito</text>
+  <text x="752" y="397" class="small">• Cliente opcional</text>
+  <text x="752" y="423" class="small">• Historial y resumen diario</text>
+
+  <!-- Procesamiento -->
+  <rect x="474" y="463" width="492" height="88" rx="16" fill="#fff" stroke="#dcece6"/>
+  <circle cx="508" cy="507" r="17" fill="#e1f3ed"/><path d="m501 507 5 5 10-11" fill="none" stroke="#148074" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="539" y="495" class="card-title">API del servidor</text>
+  <text x="539" y="521" class="small">Valida precio y stock; registra la venta</text>
+  <text x="539" y="542" class="small">y descuenta existencias en una transacción.</text>
+
+  <rect x="474" y="569" width="492" height="69" rx="15" fill="#e1f2ec"/>
+  <ellipse cx="509" cy="590" rx="13" ry="5" fill="none" stroke="#197a70" stroke-width="2"/><path d="M496 590v18c0 3 6 5 13 5s13-2 13-5v-18M496 599c0 3 6 5 13 5s13-2 13-5" fill="none" stroke="#197a70" stroke-width="2"/>
+  <text x="539" y="597" font-size="16" font-weight="700" class="teal">MongoDB local</text>
+  <text x="539" y="620" class="small">usuarios · productos · ventas</text>
+
+  <!-- Flecha sistema a resultados -->
+  <path d="M1004 432h42" stroke="#41a393" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <!-- Resultados -->
+  <g filter="url(#shadow)"><rect x="1062" y="226" width="323" height="410" rx="22" fill="#fff" stroke="#deeee7"/></g>
+  <rect x="1062" y="226" width="323" height="74" rx="22" fill="#e9f6f1"/><path d="M1062 278h323v22h-323z" fill="#e9f6f1"/>
+  <circle cx="1098" cy="263" r="17" fill="#d2eee4"/><path d="m1090 263 6 6 11-13" fill="none" stroke="#128174" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="1127" y="270" class="card-title teal">RESULTADOS ESPERADOS</text>
+  <circle cx="1093" cy="348" r="4" fill="#188476"/><text x="1109" y="354" class="bullet">Stock actualizado al vender</text>
+  <circle cx="1093" cy="400" r="4" fill="#188476"/><text x="1109" y="406" class="bullet">Avisos de stock bajo</text>
+  <circle cx="1093" cy="452" r="4" fill="#188476"/><text x="1109" y="458" class="bullet">Historial fácil de consultar</text>
+  <circle cx="1093" cy="504" r="4" fill="#188476"/><text x="1109" y="510" class="bullet">Menos errores de registro</text>
+  <rect x="1088" y="550" width="271" height="60" rx="12" fill="#f0f8f5"/>
+  <text x="1104" y="576" class="small teal" font-weight="700">Atención más rápida</text>
+  <text x="1104" y="596" class="small">para los clientes de la botica</text>
+
+  <!-- Seguridad transversal -->
+  <rect x="55" y="711" width="1330" height="145" rx="22" fill="#fff" stroke="#e2ece8"/>
+  <text x="84" y="750" class="kicker">CRITERIOS TRANSVERSALES</text>
+  <line x1="84" y1="769" x2="1356" y2="769" stroke="#eaf0ed"/>
+  <g transform="translate(86 792)"><circle cx="17" cy="17" r="17" fill="#e2f3ed"/><path d="M17 7 27 11v7c0 6-4 10-10 13-6-3-10-7-10-13v-7z" fill="none" stroke="#168074" stroke-width="2"/><path d="m12 18 4 4 7-8" fill="none" stroke="#168074" stroke-width="2"/></g>
+  <text x="137" y="805" class="card-title">Seguridad</text><text x="137" y="830" class="small">bcrypt · JWT · cookies seguras · validación</text>
+  <line x1="478" y1="792" x2="478" y2="838" stroke="#e7efeb"/>
+  <g transform="translate(507 792)"><circle cx="17" cy="17" r="17" fill="#e7f2f7"/><path d="M8 24V11h18v13M12 28h10M17 7v17" fill="none" stroke="#3185a2" stroke-width="2" stroke-linecap="round"/></g>
+  <text x="558" y="805" class="card-title">Accesibilidad</text><text x="558" y="830" class="small">Teclado · celular · movimiento reducido</text>
+  <line x1="920" y1="792" x2="920" y2="838" stroke="#e7efeb"/>
+  <g transform="translate(948 792)"><circle cx="17" cy="17" r="17" fill="#f2f4df"/><path d="M17 28c-7-4-10-9-9-14 1-5 6-6 9-2 3-4 8-3 9 2 1 5-2 10-9 14z" fill="none" stroke="#798343" stroke-width="2"/><path d="M17 26v-9m0 4-5-4m5 7 5-5" stroke="#798343" stroke-width="1.6" stroke-linecap="round"/></g>
+  <text x="999" y="805" class="card-title">Responsabilidad</text><text x="999" y="830" class="small">Menos papel · ahorro de energía · reciclaje</text>
+
+  <text x="720" y="900" text-anchor="middle" class="small">Propuesta académica para el caso práctico de la botica Nova Salud</text>
+</svg>
